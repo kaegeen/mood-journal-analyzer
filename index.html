@@ -1,0 +1,62 @@
+import { useState, useEffect } from "react";
+
+export default function MoodJournal() {
+  const [mood, setMood] = useState("");
+  const [entries, setEntries] = useState([]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("moodEntries");
+    if (saved) setEntries(JSON.parse(saved));
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("moodEntries", JSON.stringify(entries));
+  }, [entries]);
+
+  const addEntry = () => {
+    if (!mood) return;
+    const newEntry = { mood, date: new Date().toLocaleDateString() };
+    setEntries([newEntry, ...entries]);
+    setMood("");
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col items-center bg-gray-100 p-6">
+      <h1 className="text-2xl font-bold mb-4">Mood Journal</h1>
+
+      <div className="flex gap-2 mb-4">
+        <input
+          type="text"
+          value={mood}
+          onChange={(e) => setMood(e.target.value)}
+          placeholder="Enter your mood..."
+          className="border rounded p-2"
+        />
+        <button
+          onClick={addEntry}
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Save
+        </button>
+      </div>
+
+      <div className="w-full max-w-md">
+        {entries.length === 0 ? (
+          <p className="text-gray-500">No moods logged yet.</p>
+        ) : (
+          <ul className="space-y-2">
+            {entries.map((entry, i) => (
+              <li
+                key={i}
+                className="flex justify-between bg-white shadow p-3 rounded"
+              >
+                <span>{entry.mood}</span>
+                <span className="text-sm text-gray-500">{entry.date}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
